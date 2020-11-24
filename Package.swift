@@ -8,15 +8,7 @@ let package = Package(
         .library(
             name: "KSCrash",
             targets: [
-                "KSCrash/Installations",
-                "KSCrash/Recording",
-                "KSCrash/Recording/Monitors",
-                "KSCrash/Recording/Tools",
-                "KSCrash/Reporting/Filters",
-                "KSCrash/Reporting/Filters/Tools",
-                "KSCrash/Reporting/Tools",
-                "KSCrash/Reporting/Sinks",
-                "KSCrash/swift/Basic"
+                "KSCrash"
             ]
         )
     ],
@@ -128,6 +120,20 @@ let package = Package(
                 .headerSearchPath("../../llvm/Config"),
                 .headerSearchPath("../../llvm/Support")
             ]
+        ),
+        .target(name: "KSCrash",
+                dependencies: [
+                    .target(name: "KSCrash/Installations"),
+                    .target(name: "KSCrash/Recording"),
+                    .target(name: "KSCrash/Recording/Monitors"),
+                    .target(name: "KSCrash/Recording/Tools"),
+                    .target(name: "KSCrash/Reporting/Filters"),
+                    .target(name: "KSCrash/Reporting/Filters/Tools"),
+                    .target(name: "KSCrash/Reporting/Tools"),
+                    .target(name: "KSCrash/Reporting/Sinks"),
+                    .target(name: "KSCrash/swift/Basic")
+                ],
+                path: "Wrapper"
         )
     ],
     cxxLanguageStandard: .gnucxx11
