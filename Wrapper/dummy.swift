@@ -25,3 +25,9 @@
 //
 
 // Swift Package Manager needs at least one source file.
+
+import KSCrash_Recording
+import KSCrash_Installations
+import KSCrash_Reporting_Sinks
+import KSCrash_Reporting_Tools
+import KSCrash_Reporting_Filters_Tools
