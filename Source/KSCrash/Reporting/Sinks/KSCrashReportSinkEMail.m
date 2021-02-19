@@ -208,6 +208,58 @@
                                 filenameFmt:filenameFmt];
 }
 
++ (UIViewController*)ks_topViewController {
+  UIViewController* topViewController = nil;
+  
+  if (@available(iOS 13.0, *)) {
+    NSSet<UIScene *> *connectedScenes = [[UIApplication sharedApplication] connectedScenes];
+    for (UIScene *scene in  connectedScenes) {
+      if (scene.activationState == UISceneActivationStateForegroundActive) {
+        for (UIWindow *window in ((UIWindowScene *)scene).windows) {
+          if (window.isKeyWindow) {
+            topViewController = [self ks_topViewControllerWithRootViewController: window.rootViewController];
+            if (topViewController != nil) {
+              return topViewController;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  if ([UIApplication sharedApplication].keyWindow != nil) {
+    topViewController = [self ks_topViewControllerWithRootViewController:
+                         [UIApplication sharedApplication].keyWindow.rootViewController];
+  }
+  return topViewController;
+}
+
++ (UIViewController*)ks_topViewControllerWithRootViewController:
+(UIViewController*)rootViewController {
+  if ([rootViewController isKindOfClass:[UITabBarController class]]) {
+    UITabBarController* tbc = (UITabBarController *)rootViewController;
+    return [self ks_topViewControllerWithRootViewController:tbc.selectedViewController];
+  } else if ([rootViewController isKindOfClass:NSClassFromString(@"UIMoreNavigationController")]) {
+    return rootViewController.parentViewController;
+  }
+
+  else if ([rootViewController isKindOfClass:[UINavigationController class]]) {
+    UINavigationController* nvc = (UINavigationController*)rootViewController;
+    return [self ks_topViewControllerWithRootViewController:nvc.visibleViewController];
+  } else if (rootViewController.presentedViewController) {
+    return [self ks_topViewControllerWithRootViewController:rootViewController.presentedViewController];
+  } else if ([rootViewController isKindOfClass:NSClassFromString(@"UIMoreListController")]) {
+    return [self ks_topViewControllerWithRootViewController:rootViewController.parentViewController];
+  }
+  
+  return rootViewController;
+}
+
++ (UIViewController*)ks_tabBarTopViewControllerWithRootViewController:
+(UITabBarController*)rootViewController {
+    return [self ks_topViewControllerWithRootViewController:rootViewController.selectedViewController];
+}
+
 - (id) initWithRecipients:(NSArray*) recipients
                   subject:(NSString*) subject
                   message:(NSString*) message
@@ -247,17 +299,29 @@
 {
     if(![MFMailComposeViewController canSendMail])
     {
-        [[[UIAlertView alloc] initWithTitle:@"Email Error"
-                                    message:@"This device is not configured to send email."
-                                   delegate:nil
-                          cancelButtonTitle:@"OK"
-                          otherButtonTitles:nil] show];
-
-        kscrash_callCompletion(onCompletion, reports, NO,
-                                 [NSError errorWithDomain:[[self class] description]
-                                                     code:0
-                                              description:@"E-Mail not enabled on device"]);
-        return;
+      UIViewController *vc = [KSCrashReportSinkEMail ks_topViewController];
+      if (vc != nil) {
+        UIAlertController* alertController =
+        [UIAlertController alertControllerWithTitle:@"Email Error"
+                                            message:@"This device is not configured to send email."
+                                     preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction* closeAction = [UIAlertAction actionWithTitle:@"OK"
+                                                              style:UIAlertActionStyleCancel
+                                                            handler:^(UIAlertAction* _Nonnull action){
+        }];
+        [alertController addAction:closeAction];
+        
+        [vc presentViewController:alertController
+                         animated:YES
+                       completion:nil];
+      }
+      
+      kscrash_callCompletion(onCompletion, reports, NO,
+                             [NSError errorWithDomain:[[self class] description]
+                                                 code:0
+                                          description:@"E-Mail not enabled on device"]);
+      return;
     }
 
     MFMailComposeViewController* mailController = [[MFMailComposeViewController alloc] init];

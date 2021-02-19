@@ -49,7 +49,10 @@
 @property(nonatomic,readwrite,retain) NSArray* reports;
 @property(nonatomic,readwrite,copy) KSCrashReportFilterCompletion onCompletion;
 #if KSCRASH_HAS_UIALERTVIEW
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 @property(nonatomic,readwrite,retain) UIAlertView* alertView;
+#pragma clang diagnostic pop
 #endif
 @property(nonatomic,readwrite,assign) NSInteger expectedButtonIndex;
 
@@ -91,7 +94,11 @@
     self.expectedButtonIndex = noAnswer == nil ? 0 : 1;
 
 #if KSCRASH_HAS_UIALERTVIEW
-    self.alertView = [[UIAlertView alloc] init];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+  self.alertView = [[UIAlertView alloc] init];
+#pragma clang diagnostic pop
+    
     self.alertView.title = title;
     self.alertView.message = message;
     if(noAnswer != nil)
