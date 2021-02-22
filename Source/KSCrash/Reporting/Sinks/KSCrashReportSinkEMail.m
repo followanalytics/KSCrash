@@ -302,11 +302,11 @@
       UIViewController *vc = [KSCrashReportSinkEMail ks_topViewController];
       if (vc != nil) {
         UIAlertController* alertController =
-        [UIAlertController alertControllerWithTitle:@"Email Error"
-                                            message:@"This device is not configured to send email."
+        [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Email Error", "")
+                                            message:NSLocalizedString(@"This device is not configured to send email.", "")
                                      preferredStyle:UIAlertControllerStyleAlert];
         
-        UIAlertAction* closeAction = [UIAlertAction actionWithTitle:@"OK"
+        UIAlertAction* closeAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", "")
                                                               style:UIAlertActionStyleCancel
                                                             handler:^(UIAlertAction* _Nonnull action){
         }];
